@@ -39,7 +39,13 @@ sorted_data = sorted(ride_counts_by_month.items(), key=custom_sort)
 # for month, count in sorted_data:
 #     print(f"{month}: {count} rides")
 
-df = pd.DataFrame(sorted_data, columns=["Month", "Rides"])
-# pd.to_datetime(df["Month"], format="%m/%Y")
-fig = px.line(df, x="Month", y="Rides")
+total_ride_count = 0
+json_data = []
+for month, rides in sorted_data:
+    total_ride_count += rides
+    json_data.append({"Month": month, "Rides": rides, "Total Rides": total_ride_count})
+
+
+df = pd.DataFrame(json_data, columns=["Month", "Rides", "Total Rides"])
+df["Month"] = pd.to_datetime(df["Month"], format="%m/%Y")
 fig.show()
