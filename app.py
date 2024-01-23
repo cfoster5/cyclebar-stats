@@ -38,10 +38,6 @@ def process_data(data):
     # Sort the list by month and year
     sorted_data = sorted(ride_counts_by_month.items(), key=custom_sort)
 
-    # Print the ride counts for each month
-    # for month, count in sorted_data:
-    #     print(f"{month}: {count} rides")
-
     total_ride_count = 0
     json_data = []
     for month, rides in sorted_data:
