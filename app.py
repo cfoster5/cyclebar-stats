@@ -24,8 +24,7 @@ for class_entry in data["class_stats"]:
     ride_counts_by_month[output_date_str] += 1
 
 # Manually add empty months
-ride_counts_by_month["11/2021"] = 0
-ride_counts_by_month["12/2021"] = 0
+ride_counts_by_month.update({"11/2021": 0, "12/2021": 0})
 
 
 # Custom sorting function to extract month and year from the date string
