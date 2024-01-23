@@ -46,6 +46,8 @@ for month, rides in sorted_data:
     json_data.append({"Month": month, "Rides": rides, "Total Rides": total_ride_count})
 
 
+json_data.pop()
+
 df = pd.DataFrame(json_data, columns=["Month", "Rides", "Total Rides"])
 df["Month"] = pd.to_datetime(df["Month"], format="%m/%Y")
 # fig = px.line(df, x="Month", y="Rides")
