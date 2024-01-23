@@ -3,12 +3,38 @@ import json
 from collections import defaultdict
 import pandas as pd
 import plotly.express as px
+import requests
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+location_id = os.getenv("LOCATION_ID")
+email = os.getenv("EMAIL")
+password = os.getenv("PASSWORD")
 
 
-def load_data():
-    # Load JSON data from file
-    with open("workout_stats.json", "r") as file:
-        return json.load(file)
+def get_access_token():
+    url = "https://members.cyclebar.com/api/sessions"
+    payload = json.dumps(
+        {
+            "location_id": location_id,
+            "email": email,
+            "password": password,
+        }
+    )
+    headers = {"Content-Type": "application/json"}
+    response = requests.post(url, headers=headers, data=payload)
+    return response.json()["user"]["access_token"]
+
+
+def get_data(access_token):
+    url = "https://members.cyclebar.com/api/workout_stats"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+    }
+    response = requests.get(url, headers=headers)
+    return response.json()
 
 
 # Custom sorting function to extract month and year from the date string
@@ -66,7 +92,8 @@ def create_plot(df):
 
 
 if __name__ == "__main__":
-    data = load_data()
+    access_token = get_access_token()
+    data = get_data(access_token)
     json_data = process_data(data)
     df = create_dataframe(json_data)
     create_plot(df)
