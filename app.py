@@ -48,5 +48,6 @@ for month, rides in sorted_data:
 
 df = pd.DataFrame(json_data, columns=["Month", "Rides", "Total Rides"])
 df["Month"] = pd.to_datetime(df["Month"], format="%m/%Y")
+fig = px.line(df, x="Month", y="Rides", width=900, height=1600)
 fig.update_traces(line_color="#d0021b")
 fig.show()
