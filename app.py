@@ -4,11 +4,19 @@ from collections import defaultdict
 import pandas as pd
 import plotly.express as px
 
-if __name__ == "__main__":
+
+def load_data():
     # Load JSON data from file
     with open("workout_stats.json", "r") as file:
-        data = json.load(file)
+        return json.load(file)
 
+
+# Custom sorting function to extract month and year from the date string
+def custom_sort(item):
+    return (int(item[0].split("/")[1]), int(item[0].split("/")[0]))
+
+
+def process_data(data):
     # Create a defaultdict to store ride counts for each month
     ride_counts_by_month = defaultdict(int)
 
@@ -27,10 +35,6 @@ if __name__ == "__main__":
     # Manually add empty months
     ride_counts_by_month.update({"11/2021": 0, "12/2021": 0})
 
-    # Custom sorting function to extract month and year from the date string
-    def custom_sort(item):
-        return (int(item[0].split("/")[1]), int(item[0].split("/")[0]))
-
     # Sort the list by month and year
     sorted_data = sorted(ride_counts_by_month.items(), key=custom_sort)
 
@@ -47,12 +51,26 @@ if __name__ == "__main__":
         )
 
     json_data.pop()
+    return json_data
 
+
+def create_dataframe(json_data):
     df = pd.DataFrame(json_data, columns=["Month", "Rides", "Total Rides"])
     df["Month"] = pd.to_datetime(df["Month"], format="%m/%Y")
+    return df
+
+
+def create_plot(df):
     # fig = px.line(df, x="Month", y="Rides")
     fig = px.line(df, x="Month", y="Rides", width=900, height=1600)
     # fig = px.line(df, x="Month", y="Total Rides", width=900, height=1600)
     # fig = px.line(df, x="Month", y=["Rides", "Total Rides"])
     fig.update_traces(line_color="#d0021b")
     fig.show()
+
+
+if __name__ == "__main__":
+    data = load_data()
+    json_data = process_data(data)
+    df = create_dataframe(json_data)
+    create_plot(df)
