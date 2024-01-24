@@ -1,10 +1,10 @@
 from datetime import datetime
-import json
 from collections import defaultdict
+import time
 import pandas as pd
 import plotly.express as px
 import requests
-from dotenv import load_dotenv
+from dotenv import load_dotenv, set_key
 import os
 
 load_dotenv()
@@ -12,20 +12,32 @@ load_dotenv()
 location_id = os.getenv("LOCATION_ID")
 email = os.getenv("EMAIL")
 password = os.getenv("PASSWORD")
+access_token = os.getenv("ACCESS_TOKEN")
+access_token_expires_at = int(os.getenv("ACCESS_TOKEN_EXPIRES_AT"))
 
 
 def get_access_token():
-    url = "https://members.cyclebar.com/api/sessions"
-    payload = json.dumps(
-        {
+    timestamp_seconds = int(time.time())
+    if timestamp_seconds >= access_token_expires_at:
+        url = "https://members.cyclebar.com/api/sessions"
+        payload = {
             "location_id": location_id,
             "email": email,
             "password": password,
         }
-    )
-    headers = {"Content-Type": "application/json"}
-    response = requests.post(url, headers=headers, data=payload)
-    return response.json()["user"]["access_token"]
+        headers = {"Content-Type": "application/json"}
+        response = requests.post(url, headers=headers, json=payload)
+        new_access_token = response.json()["user"]["access_token"]
+        new_expires_at = response.json()["user"]["access_token_expires_at"]
+        set_key(".env", "ACCESS_TOKEN", new_access_token)
+        set_key(
+            ".env",
+            "ACCESS_TOKEN_EXPIRES_AT",
+            str(new_expires_at),
+        )
+        return new_access_token
+    else:
+        return access_token
 
 
 def get_data(access_token):
