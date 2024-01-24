@@ -55,8 +55,8 @@ def custom_sort(item):
 
 
 def process_data(data):
-    # Create a defaultdict to store ride counts for each month
-    ride_counts_by_month = defaultdict(int)
+    # Create a defaultdict to store ride counts and first place counts for each month
+    ride_data_by_month = defaultdict(lambda: {"rides": 0, "top_five_count": 0})
 
     # Process each class entry
     for class_entry in data["class_stats"]:
@@ -67,21 +67,37 @@ def process_data(data):
         # Format the datetime object to the desired output format
         # output_date_str = input_date.strftime("%B %Y")
         output_date_str = input_date.strftime("%m/%Y")
-        # Increment the count for the corresponding month
-        ride_counts_by_month[output_date_str] += 1
+        # Increment the count for rides
+        ride_data_by_month[output_date_str]["rides"] += 1
+        print(class_entry["rank"])
+        if class_entry["rank"] is not None and class_entry["rank"] < 6:
+            ride_data_by_month[output_date_str]["top_five_count"] += 1
 
-    # Manually add empty months
-    ride_counts_by_month.update({"11/2021": 0, "12/2021": 0})
+        # Manually add empty months
+        ride_data_by_month.update(
+            {
+                "11/2021": {"rides": 0, "top_five_count": 0},
+                "12/2021": {"rides": 0, "top_five_count": 0},
+            }
+        )
 
     # Sort the list by month and year
-    sorted_data = sorted(ride_counts_by_month.items(), key=custom_sort)
+    sorted_data = sorted(ride_data_by_month.items(), key=custom_sort)
 
     total_ride_count = 0
+    total_top_five_count = 0
     json_data = []
-    for month, rides in sorted_data:
-        total_ride_count += rides
+    for month, data in sorted_data:
+        total_ride_count += data["rides"]
+        total_top_five_count += data["top_five_count"]
         json_data.append(
-            {"Month": month, "Rides": rides, "Total Rides": total_ride_count}
+            {
+                "Month": month,
+                "Rides": data["rides"],
+                "Total Rides": total_ride_count,
+                "Top Five Count": data["top_five_count"],
+                "Total Top Five Count": total_top_five_count,
+            }
         )
 
     json_data.pop()
@@ -89,17 +105,31 @@ def process_data(data):
 
 
 def create_dataframe(json_data):
-    df = pd.DataFrame(json_data, columns=["Month", "Rides", "Total Rides"])
+    df = pd.DataFrame(
+        json_data, columns=["Month", "Rides", "Total Rides", "Total Top Five Count"]
+    )
     df["Month"] = pd.to_datetime(df["Month"], format="%m/%Y")
     return df
 
 
 def create_plot(df):
-    # fig = px.line(df, x="Month", y="Rides")
-    fig = px.line(df, x="Month", y="Rides", width=900, height=1600)
+    fig = px.line(
+        df,
+        x="Month",
+        y="Total Rides",
+        # width=900,
+        # height=1600,
+        title="Rides per month",
+        # line_shape="spline",
+    )
     # fig = px.line(df, x="Month", y="Total Rides", width=900, height=1600)
-    # fig = px.line(df, x="Month", y=["Rides", "Total Rides"])
-    fig.update_traces(line_color="#d0021b")
+    fig = px.line(
+        df,
+        x="Month",
+        y=["Rides", "Total Rides", "Total Top Five Count"],
+    )
+    fig.update_traces(line=dict(color="#d0021b", width=4))
+    # fig.update_layout(font=dict(size=10))
     fig.show()
 
 
