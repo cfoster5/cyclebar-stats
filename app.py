@@ -49,11 +49,6 @@ def get_data(access_token):
     return response.json()
 
 
-# Custom sorting function to extract month and year from the date string
-def custom_sort(item):
-    return (int(item[0].split("/")[1]), int(item[0].split("/")[0]))
-
-
 def process_data(data):
     # Create a defaultdict to store ride counts for each month
     ride_counts_by_month = defaultdict(int)
@@ -71,7 +66,10 @@ def process_data(data):
         ride_counts_by_month[output_date_str] += 1
 
     # Sort the list by month and year
-    sorted_data = sorted(ride_counts_by_month.items(), key=custom_sort)
+    sorted_data = sorted(
+        ride_counts_by_month.items(),
+        key=lambda item: datetime.strptime(item[0], "%m/%Y"),
+    )
 
     total_ride_count = 0
     json_data = []
