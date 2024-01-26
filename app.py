@@ -85,7 +85,7 @@ def create_plot(df):
     fig = px.line(df, x="Month", y="Rides", width=900, height=1600)
     # fig = px.line(df, x="Month", y="Total Rides", width=900, height=1600)
     # fig = px.line(df, x="Month", y=["Rides", "Total Rides"])
-    fig.update_traces(line_color="#d0021b")
+    fig.update_traces(line=dict(color="#d0021b", width=4))
     fig.show()
 
 
