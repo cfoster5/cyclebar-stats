@@ -70,21 +70,13 @@ def process_data(data):
         key=lambda item: datetime.strptime(item[0], "%m/%Y"),
     )
 
-    total_ride_count = 0
-    json_data = []
-    for month, rides in sorted_data:
-        total_ride_count += rides
-        json_data.append(
-            {"Month": month, "Rides": rides, "Total Rides": total_ride_count}
-        )
-
-    json_data.pop()
-    return json_data
+    return sorted_data
 
 
 def create_dataframe(json_data):
-    df = pd.DataFrame(json_data, columns=["Month", "Rides", "Total Rides"])
+    df = pd.DataFrame(json_data, columns=["Month", "Rides"])
     df["Month"] = pd.to_datetime(df["Month"], format="%m/%Y")
+    df["Total Rides"] = df["Rides"].cumsum()
     return df
 
 
@@ -100,6 +92,6 @@ def create_plot(df):
 if __name__ == "__main__":
     access_token = get_access_token()
     data = get_data(access_token)
-    json_data = process_data(data)
-    df = create_dataframe(json_data)
+    sorted_data = process_data(data)
+    df = create_dataframe(sorted_data)
     create_plot(df)
