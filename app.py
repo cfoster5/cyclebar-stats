@@ -70,9 +70,6 @@ def process_data(data):
         # Increment the count for the corresponding month
         ride_counts_by_month[output_date_str] += 1
 
-    # Manually add empty months
-    ride_counts_by_month.update({"11/2021": 0, "12/2021": 0})
-
     # Sort the list by month and year
     sorted_data = sorted(ride_counts_by_month.items(), key=custom_sort)
 
