@@ -60,7 +60,6 @@ def process_data(data):
         # Convert the string to a datetime object
         input_date = datetime.strptime(date, "%Y-%m-%d")
         # Format the datetime object to the desired output format
-        # output_date_str = input_date.strftime("%B %Y")
         output_date_str = input_date.strftime("%m/%Y")
         # Increment the count for the corresponding month
         ride_counts_by_month[output_date_str] += 1
