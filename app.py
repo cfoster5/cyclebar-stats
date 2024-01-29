@@ -6,6 +6,11 @@ import plotly.express as px
 import requests
 from dotenv import load_dotenv, set_key
 import os
+from flask import Flask
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)
 
 load_dotenv()
 
@@ -74,24 +79,17 @@ def process_data(data):
 
 
 def create_dataframe(json_data):
-    df = pd.DataFrame(json_data, columns=["Month", "Rides"])
-    df["Month"] = pd.to_datetime(df["Month"], format="%m/%Y")
-    df["Total Rides"] = df["Rides"].cumsum()
+    df = pd.DataFrame(json_data, columns=["month", "rides"])
+    df["month"] = pd.to_datetime(df["month"], format="%m/%Y")
+    df["total_rides"] = df["rides"].cumsum()
     return df
 
 
-def create_plot(df):
-    # fig = px.line(df, x="Month", y="Rides")
-    fig = px.line(df, x="Month", y="Rides", width=900, height=1600)
-    # fig = px.line(df, x="Month", y="Total Rides", width=900, height=1600)
-    # fig = px.line(df, x="Month", y=["Rides", "Total Rides"])
-    fig.update_traces(line=dict(color="#d0021b", width=4))
-    fig.show()
-
-
-if __name__ == "__main__":
+@app.route("/")
+def handle():
     access_token = get_access_token()
     data = get_data(access_token)
     sorted_data = process_data(data)
     df = create_dataframe(sorted_data)
-    create_plot(df)
+    json = df.to_json(orient="records", date_format="iso")
+    return json
