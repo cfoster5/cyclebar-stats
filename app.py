@@ -2,7 +2,6 @@ from datetime import datetime
 from collections import defaultdict
 import time
 import pandas as pd
-import plotly.express as px
 import requests
 from dotenv import load_dotenv, set_key
 import os
