@@ -1,10 +1,11 @@
-from datetime import datetime
-from collections import defaultdict
+import os
 import time
+from collections import defaultdict
+from datetime import datetime
+
 import pandas as pd
 import requests
 from dotenv import load_dotenv, set_key
-import os
 from flask import Flask
 from flask_cors import CORS
 
